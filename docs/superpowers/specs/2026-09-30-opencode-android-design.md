@@ -29,7 +29,7 @@
 - Gradle multi-module from M1 (even if some are stubs): `:core:agent`, `:core:tools`, `:core:providers`, `:core:session`, `:core:permission`, `:core:config`, `:core:mcp`, `:core:shell`, `:core:server` (optional embedded Ktor API, off by default), `:app` (UI), `:native` (NDK).
 - Pure-Kotlin discipline (C): `:core:agent`, `:core:tools`, `:core:providers`, `:core:config` contain zero `android.*` imports. Only `:core:session` (Room) and `:core:permission` (Keystore / notification / FGS bridge interfaces) touch Android. This lets JVM unit tests and `conformance.yml` run without an emulator.
 - Stack: Kotlin, Compose + Material 3, coroutines/Flow, kotlinx.serialization, Ktor client, Room, Hilt. minSdk 26, targetSdk latest stable at build time. No GMS/Firebase. F-Droid friendly.
-- Attribution: keep upstream `LICENSE` (MIT) and attribution note. Add README note clarifying this port is not built by the opencode team and is not affiliated, per upstream request for `opencode-*` named projects.
+- Attribution and branding: keep upstream `LICENSE` (MIT) and attribution. App uses official opencode name, UX structure, and UI elements as the reference (sessions, streaming chat, tool cards, diffs, permission prompts, model/agent pickers, commands), reimplemented natively in Compose + Material 3 and optimized for mobile screens. Add README note clarifying this port is not built by the opencode team and is not affiliated, per upstream request for `opencode-*` named projects. Do not claim to be official; do not remove upstream credit.
 - Cloud dev: `.devcontainer` with JDK 21, Android cmdline-tools, pinned SDK/NDK, Gradle, Bun (to run upstream as reference only, never embedded). Codespaces prebuilds enabled, 4-core+ machine. Gradle build cache + dependency caching in Actions.
 
 ## 3. Components (Approved Section 2)
@@ -43,7 +43,7 @@
 7. **MCP** (`:core:mcp`): remote (HTTP/SSE) first. Local stdio only where binaries can run on Android (constrained; document gaps in `limitations.md`).
 8. **Shell** (`:core:shell`): `/system/bin/sh` + toybox plus NDK-built `busybox` and `ripgrep` shipped as `jniLibs` `lib*.so` with `useLegacyPackaging = true` (only reliable exec under W^X on targetSdk 29+). Optional milestone: NDK-built `git` (JGit remains primary).
 9. **Server** (`:core:server`, optional, off by default): embedded localhost Ktor API implementing the upstream OpenAPI subset. Used for conformance tests and LAN use.
-10. **UI** (`:app`): sessions list, streaming chat with markdown and collapsible tool cards, diff viewer, file browser/editor, permission sheet, model/agent picker, settings. Adaptive tablet/foldable layout. TalkBack support.
+10. **UI** (`:app`): faithful mobile adaptation of official opencode UX — sessions list, streaming chat with markdown and collapsible tool cards, diff viewer, file browser/editor, permission sheet, model/agent picker, settings, commands palette — same information architecture and element semantics as upstream TUI/console, restyled natively with Material 3 for phones, tablets, and foldables. Mobile-perfect goal: no clipped text, no overlapping sheets, no lost scroll position during streaming, no jank on weak hardware. Means: LazyColumn with stable keys and chunked markdown rendering, cancellable streaming collectors, R8 + baseline-profile, strictMode-clean, TalkBack labels on every interactive card/sheet, adaptive navigation (single-pane phone, two-pane tablet/foldable).
 11. **Native** (`:native`): NDK builds for `busybox`, `ripgrep` (M3), later `git` and QuickJS plugin runtime (M7). ABIs `arm64-v8a` + `x86_64`. Linker flag `-Wl,-z,max-page-size=16384` for 16 KB page alignment. Verified in CI with `readelf`.
 
 Out of scope for M1-M6, scheduled M7: plugins/custom tools via embedded QuickJS (documented subset), OAuth/device flows, NDK git, polish, F-Droid release.
@@ -58,6 +58,7 @@ Out of scope for M1-M6, scheduled M7: plugins/custom tools via embedded QuickJS 
 - Workspaces: live in app-private storage (real POSIX paths, needed by shell). Import/export via SAF zip. `git clone` / `pull` / `push` via JGit.
 - Long commands and agent runs: run in a foreground service with correct FGS type for API 34+, cancellable, output streaming, timeouts. Design accounts for Android 12+ phantom-process killer (child-process death treated as retryable tool failure, documented in `limitations.md`).
 - TalkBack: all interactive cards and sheets expose content descriptions and actions.
+- Weak-hardware smoothness (all devices, especially low-end, minSdk 26): cold-start and chat-scroll budgets enforced in CI via JVM benchmarks + constrained-emulator smoke (low-RAM AVD profile, e.g. 2 GB, API 30, x86_64 KVM) with frame-time and memory ceilings; baseline-profile + R8 required for release; streaming UI renders incrementally (no full-list recomposition per token); images/coarse assets avoided in chat path; Room paging for sessions/parts. No real-hardware perf claims — unverifiable risks go in `docs/limitations.md`.
 
 ## 5. Error handling, testing, cloud CI (Approved Section 4)
 
@@ -74,15 +75,15 @@ Out of scope for M1-M6, scheduled M7: plugins/custom tools via embedded QuickJS 
 - JVM unit tests for agent loop, tool sandboxing, path traversal, permission bypass attempts, large-output truncation, cancellation, process cleanup.
 - Robolectric for Android-coupled logic. JVM benchmarks for perf budgets (no hardware performance claims).
 - Emulator instrumented tests on `x86_64` emulators (API 30, 34, latest) using KVM-enabled runners and `android-emulator-runner`. Artifacts uploaded: logcat, screenshots, screenrecord mp4, UI hierarchy dumps, tombstones/ANR traces. The `scenarios.yml` workflow_dispatch E2E with mock LLM + video + logs is the cloud debugger.
-- Golden screenshots via Roborazzi or Paparazzi; diffs posted as PR comments.
-- `conformance.yml`: pins upstream, runs it via Bun on the runner as oracle, differential-tests this port (tool outputs, edit/patch results, permission decisions, config resolution, OpenAPI responses). Fails on divergence. Target 90%+ by M6.
+- Golden screenshots via Roborazzi or Paparazzi covering phone + tablet + foldable + dark/light + large-font; diffs posted as PR comments; zero-tolerance for clipping/overlap/regression before merge.
+- `conformance.yml`: pins upstream, runs it via Bun on the runner as oracle, differential-tests this port (tool outputs, edit/patch results, permission decisions, config resolution, OpenAPI responses, plus UI element/UX parity checklist for screens/states). Fails on divergence. Target 90%+ by M6, 100% by M7.
 - `upstream-watch.yml` (nightly): detects new upstream releases, diffs OpenAPI spec / tool schemas, opens an issue.
 - `baseline-profile` generation in CI on the emulator.
 - `release.yml`: signed APK/AAB (keys in GitHub Secrets), checksums, SBOM, GitHub Release, fastlane metadata for F-Droid.
 
 **Required workflows (all in cloud):** `ci.yml` (ktlint, detekt, unit tests, Robolectric, debug APK, NDK matrix both ABIs, ELF 16 KB alignment check with `readelf`), `emulator.yml`, screenshots, `conformance.yml`, `scenarios.yml`, `upstream-watch.yml`, `release.yml`.
 
-**Docs required:** `UPSTREAM.md` (pinned commit + ALL upstream source files read per module, no module implemented from memory), `docs/parity.md` (every upstream-behavior decision, zero undocumented divergence), `docs/limitations.md` (cloud-substitute gaps + unverifiable perf risks + phantom-process + MCP stdio constraints), F-Droid fastlane metadata by M7.
+**Docs required:** `UPSTREAM.md` (pinned commit + ALL upstream source files read per module including TUI/console/web UI source for UX parity, no module implemented from memory), `docs/parity.md` (every upstream-behavior decision including UI/UX element mapping, zero undocumented divergence), `docs/limitations.md` (cloud-substitute gaps + unverifiable perf risks including real weak-hardware behavior + phantom-process + MCP stdio constraints), F-Droid fastlane metadata by M7.
 
 ## 6. Milestones (each ends green CI + downloadable debug APK, each gets its own implementation plan starting with M1)
 
