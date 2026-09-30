@@ -1,0 +1,6 @@
+[
+  "data: {\"type\": \"response.output_text.delta\", \"output_index\": 0, \"delta\": \"Hello\"}\n\n",
+  "data: {\"type\": \"response.function_call.delta\", \"output_index\": 1, \"delta\": \"{\\\"name\\\": \\\"bash\\\"}\"}\n\n",
+  "data: {\"type\": \"response.completed\", \"response\": {\"id\": \"resp_mock001\", \"status\": \"completed\"}}\n\n",
+  "data: [DONE]\n\n"
+]

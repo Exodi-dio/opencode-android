@@ -1,0 +1,6 @@
+[
+  "data: {\"id\": \"chatcmpl-mock001\", \"object\": \"chat.completion.chunk\", \"created\": 1727650000, \"model\": \"mock-model\", \"choices\": [{\"index\": 0, \"delta\": {\"role\": \"assistant\", \"content\": \"Hello\"}, \"finish_reason\": null}]}\n\n",
+  "data: {\"id\": \"chatcmpl-mock001\", \"object\": \"chat.completion.chunk\", \"created\": 1727650000, \"model\": \"mock-model\", \"choices\": [{\"index\": 0, \"delta\": {\"tool_calls\": [{\"index\": 0, \"id\": \"call_001\", \"type\": \"function\", \"function\": {\"name\": \"read\", \"arguments\": \"{\\\"path\\\": \\\"src/main.kt\\\"}\"}}]}, \"finish_reason\": null}]}\n\n",
+  "data: {\"id\": \"chatcmpl-mock001\", \"object\": \"chat.completion.chunk\", \"created\": 1727650000, \"model\": \"mock-model\", \"choices\": [{\"index\": 0, \"delta\": {\"content\": \" done\"}, \"finish_reason\": \"tool_calls\"}]}\n\n",
+  "data: [DONE]\n\n"
+]

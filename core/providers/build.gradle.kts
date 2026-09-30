@@ -11,5 +11,10 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 }
 
 dependencies {
+  testImplementation(project(":core:tools"))
+  testImplementation(project(":core:permission"))
+  testImplementation(libs.ktor.server.core)
+  testImplementation(libs.ktor.server.netty)
+  testImplementation(libs.serialization.json)
   testImplementation(libs.junit4)
 }
