@@ -1,0 +1,10 @@
+# Isolated workspaces (never commit worktree checkouts)
+.worktrees/
+# SDD scratch (ledger, briefs, reports, review packages)
+.superpowers/
+# Gradle / Android
+.gradle/
+build/
+local.properties
+*.iml
+.DS_Store
