@@ -10,7 +10,6 @@ import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
 class SessionDaoTest {
-
   @Test fun sessionDaoRoundTrip() {
     val ctx = RuntimeEnvironment.getApplication()
     val db = Room.inMemoryDatabaseBuilder(ctx, SessionDatabase::class.java).allowMainThreadQueries().build()

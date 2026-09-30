@@ -2,12 +2,12 @@ package com.opencode.session
 
 import android.content.Context
 import androidx.room.Database
+import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import androidx.room.PrimaryKey
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 
 @Entity(tableName = "sessions")
 data class SessionEntity(
