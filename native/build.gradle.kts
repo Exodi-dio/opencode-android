@@ -7,6 +7,7 @@ plugins {
 android {
   namespace = "com.opencode.nativelib"
   compileSdk = libs.versions.compileSdk.get().toInt()
+  ndkVersion = libs.versions.ndk.get()
 
   defaultConfig {
     minSdk = libs.versions.minSdk.get().toInt()

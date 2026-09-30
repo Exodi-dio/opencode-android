@@ -13,7 +13,7 @@ class SessionDaoTest {
 
   @Test fun sessionDaoRoundTrip() {
     val ctx = RuntimeEnvironment.getApplication()
-    val db = Room.inMemoryDatabaseBuilder(ctx, SessionDatabase::class.java).build()
+    val db = Room.inMemoryDatabaseBuilder(ctx, SessionDatabase::class.java).allowMainThreadQueries().build()
     val id = db.sessionDao().insertSession(SessionEntity("s1", 1L))
     assertTrue(id >= 0)
     assertEquals(0, db.sessionDao().partsForSession("s1").size)

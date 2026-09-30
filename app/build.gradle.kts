@@ -8,6 +8,7 @@ plugins {
 android {
   namespace = "com.opencode.android"
   compileSdk = libs.versions.compileSdk.get().toInt()
+  ndkVersion = libs.versions.ndk.get()
 
   defaultConfig {
     applicationId = "com.opencode.android"
