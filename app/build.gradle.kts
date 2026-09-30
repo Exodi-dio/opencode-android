@@ -1,8 +1,13 @@
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.android)
+  // Task 7 official-UX shell (Compose UI).
+  alias(libs.plugins.compose.compiler)
   alias(libs.plugins.hilt)
   alias(libs.plugins.ksp)
+  // Task 7 screenshot gates (screenshots.yml: verifyPaparazziDebug + compareRoborazziDebug).
+  alias(libs.plugins.paparazzi)
+  alias(libs.plugins.roborazzi)
 }
 
 android {
@@ -31,6 +36,11 @@ android {
     }
   }
 
+  // Task 7 official-UX shell (Compose UI).
+  buildFeatures {
+    compose = true
+  }
+
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
@@ -45,11 +55,18 @@ android {
 }
 
 dependencies {
+  // Task 7 official-UX shell (versions resolve from the Compose BOM pin).
+  implementation(platform(libs.compose.bom))
+  implementation(libs.compose.ui)
+  implementation(libs.compose.foundation)
+  implementation(libs.compose.material3)
   implementation(libs.hilt.android)
   ksp(libs.hilt.compiler)
   // M1 StartupTest (Robolectric, activity launches).
   testImplementation(libs.junit4)
   testImplementation(libs.robolectric)
+  // Task 7 Paparazzi goldens (screenshots workflow verify step).
+  testImplementation(libs.paparazzi)
   // M1 LaunchTest (instrumented, emulator/scenarios workflows).
   androidTestImplementation(libs.androidx.test.ext.junit)
   androidTestImplementation(libs.test.runner)

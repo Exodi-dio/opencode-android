@@ -8,8 +8,13 @@ plugins {
   alias(libs.plugins.android.library) apply false
   alias(libs.plugins.kotlin.android) apply false
   alias(libs.plugins.kotlin.jvm) apply false
+  // Task 7 official-UX shell: Compose compiler tracks the Kotlin pin.
+  alias(libs.plugins.compose.compiler) apply false
   alias(libs.plugins.hilt) apply false
   alias(libs.plugins.ksp) apply false
+  // Task 7 screenshot gates: applied in :app so the bare task names resolve.
+  alias(libs.plugins.paparazzi) apply false
+  alias(libs.plugins.roborazzi) apply false
   // M1 lint gate (CI `lint` job runs `./gradlew ktlintCheck detekt`): applied to
   // the root project here so the bare task names resolve at the root too.
   alias(libs.plugins.ktlint)
