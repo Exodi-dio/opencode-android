@@ -18,15 +18,15 @@ class MockLlmServer {
 
   fun start(): Int {
     val server =
-        embeddedServer(
-            Netty,
-            port = 0,
-        ) {
-      routing {
-        get("/v1/chat") {
-          call.respondText(replay("chat_stream_001").joinToString(""), ContentType.Text.EventStream)
-        }
-        get("/v1/responses") {
+      embeddedServer(
+        Netty,
+        port = 0,
+      ) {
+        routing {
+          get("/v1/chat") {
+            call.respondText(replay("chat_stream_001").joinToString(""), ContentType.Text.EventStream)
+          }
+          get("/v1/responses") {
           call.respondText(replay("responses_001").joinToString(""), ContentType.Text.EventStream)
         }
       }
