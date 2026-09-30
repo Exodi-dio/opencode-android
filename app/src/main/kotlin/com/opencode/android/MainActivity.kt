@@ -1,12 +1,19 @@
 package com.opencode.android
 
-import android.app.Activity
 import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import com.opencode.android.ui.SessionsScreen
+import com.opencode.android.ui.theme.OpencodeTheme
 
-// M1 stub: theme only (see AndroidManifest.xml application theme). No UI logic;
-// full official-UX shell lands in Task 7.
-class MainActivity : Activity() {
+// M1 shell: sessions list is the start destination; full router lands later.
+class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    setContent {
+      OpencodeTheme(darkTheme = true) {
+        SessionsScreen()
+      }
+    }
   }
 }

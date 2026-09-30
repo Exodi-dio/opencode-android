@@ -60,6 +60,8 @@ dependencies {
   implementation(libs.compose.ui)
   implementation(libs.compose.foundation)
   implementation(libs.compose.material3)
+  // Task 7 fix round 2: ComponentActivity.setContent for MainActivity.
+  implementation(libs.activity.compose)
   implementation(libs.hilt.android)
   ksp(libs.hilt.compiler)
   // Task 7 fix: SessionsScreen renders frozen SessionEntity from :core:session.
