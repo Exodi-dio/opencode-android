@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-30
 **Repo:** `Exodi-dio/opencode-android` (public)
-**Upstream:** `anomalyco/opencode` (MIT, formerly `sst/opencode`), default branch `dev`. Exact pinned commit recorded in `UPSTREAM.md` at implementation time (M1) by reading upstream source before implementing each module. Never guess behavior.
+**Upstream:** `anomalyco/opencode` (MIT, formerly `sst/opencode`), default branch `dev`. Exact pinned commit recorded in `UPSTREAM.md` at implementation time (M1). Full-port principle: use the official opencode on GitHub as the reference oracle, read ALL of its code before implementing each module, and port every capability and functionality so the app retains full upstream behavior in native Kotlin. Never guess behavior; never ship an intentional subset. Where Android makes exact behavior impossible, attempt a cloud substitute first, then document the gap in `docs/limitations.md` and continue.
 **Status:** Conversational design approved (Sections 1-4). Written spec pending user review.
 
 > **For agentic workers:** This spec travels with the implementation plan. The plan argues from this spec. Cloud-only: zero hardware. Everything (writing code, compiling, testing, debugging, profiling, releasing) happens in GitHub Codespaces and GitHub Actions. Never add a step, doc, or instruction that needs a local computer, a physical phone, or a local emulator. Never write "test on a device". If something seems to need hardware, find a cloud substitute; if none exists, document the limitation in `docs/limitations.md` and continue.
@@ -14,8 +14,8 @@
 **Who it is for:** Android developers and F-Droid users who want an offline-capable, provider-agnostic coding agent in app-private storage with git via JGit and SAF import/export.
 
 **Success criteria:**
-- Milestones M1-M7 each end with green CI and a downloadable debug APK artifact from Actions.
-- `conformance.yml` differential-tests the port against upstream run via Bun as oracle (tool outputs, edit/patch results, permission decisions, config resolution, OpenAPI responses) and reaches 90%+ by M6.
+- Milestones M1-M7 each end with green CI and a downloadable debug APK artifact from Actions. No time limit: take as much time as needed, favor completeness and correctness over speed, small correct commits.
+- Full parity: every upstream capability ported (agent loop, all tools with identical schemas, all agents/modes, permissions, providers, config precedence, sessions, MCP, shell, server subset). `conformance.yml` differential-tests the port against upstream run via Bun as oracle (tool outputs, edit/patch results, permission decisions, config resolution, OpenAPI responses) and reaches 90%+ by M6, 100% by M7.
 - No Google Play Services / Firebase. F-Droid friendly (fastlane metadata, SBOM, checksums, signed APK/AAB via Secrets).
 - All tests deterministic via mock LLM server (recorded fixtures + scripted tool-call streams, no API keys).
 - Every upstream-behavior decision recorded in `docs/parity.md`. Unverifiable-on-emulator perf risks listed in `docs/limitations.md`.
@@ -82,7 +82,7 @@ Out of scope for M1-M6, scheduled M7: plugins/custom tools via embedded QuickJS 
 
 **Required workflows (all in cloud):** `ci.yml` (ktlint, detekt, unit tests, Robolectric, debug APK, NDK matrix both ABIs, ELF 16 KB alignment check with `readelf`), `emulator.yml`, screenshots, `conformance.yml`, `scenarios.yml`, `upstream-watch.yml`, `release.yml`.
 
-**Docs required:** `UPSTREAM.md` (pinned commit + source files read per module), `docs/parity.md` (every upstream-behavior decision), `docs/limitations.md` (cloud-substitute gaps + unverifiable perf risks + phantom-process + MCP stdio constraints), F-Droid fastlane metadata by M7.
+**Docs required:** `UPSTREAM.md` (pinned commit + ALL upstream source files read per module, no module implemented from memory), `docs/parity.md` (every upstream-behavior decision, zero undocumented divergence), `docs/limitations.md` (cloud-substitute gaps + unverifiable perf risks + phantom-process + MCP stdio constraints), F-Droid fastlane metadata by M7.
 
 ## 6. Milestones (each ends green CI + downloadable debug APK, each gets its own implementation plan starting with M1)
 
@@ -91,8 +91,8 @@ Out of scope for M1-M6, scheduled M7: plugins/custom tools via embedded QuickJS 
 - **M3** shell runtime (busybox/ripgrep via NDK, 16 KB check) + bash tool + permissions (sheet + notification actions) + FGS.
 - **M4** sessions/storage/compaction/subagents + config parity (precedence, AGENTS.md, commands/agents).
 - **M5** full UI, notifications, foreground service, adaptive layout, TalkBack, baseline-profile.
-- **M6** MCP (remote first), webfetch, JGit, embedded server (off by default), conformance suite at 90%+.
-- **M7** plugins (QuickJS subset), OAuth, polish, F-Droid release (signed AAB/APK, SBOM, checksums, fastlane).
+- **M6** MCP (remote first), webfetch, JGit, embedded server (off by default), conformance suite at 90%+ (path to 100%).
+- **M7** plugins (QuickJS subset covering all upstream plugin hooks), OAuth, polish, full 100% conformance, F-Droid release (signed AAB/APK, SBOM, checksums, fastlane).
 
 Process: small commits, PR per milestone, `docs/parity.md` updated per decision. Questions to maintainer limited to architecture-level tradeoffs, never hardware.
 
