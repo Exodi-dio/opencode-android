@@ -27,10 +27,10 @@ class MockLlmServer {
             call.respondText(replay("chat_stream_001").joinToString(""), ContentType.Text.EventStream)
           }
           get("/v1/responses") {
-          call.respondText(replay("responses_001").joinToString(""), ContentType.Text.EventStream)
+            call.respondText(replay("responses_001").joinToString(""), ContentType.Text.EventStream)
+          }
         }
       }
-    }
     server.start(wait = false)
     engine = server
     return runBlocking { server.resolvedConnectors() }.first().port
