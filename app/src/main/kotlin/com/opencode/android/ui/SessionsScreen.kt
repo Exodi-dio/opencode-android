@@ -25,29 +25,29 @@ import com.opencode.session.SessionEntity
 @Composable
 fun SessionsScreen(
   onNewSession: () -> Unit = {},
-  sessions: List<SessionEntity> = emptyList()
+  sessions: List<SessionEntity> = emptyList(),
 ) {
   val sessionsListState = rememberLazyListState()
   Column(
     modifier = Modifier.fillMaxSize().padding(all = 16.dp),
-    verticalArrangement = Arrangement.spacedBy(space = 12.dp)
+    verticalArrangement = Arrangement.spacedBy(space = 12.dp),
   ) {
     Text(
       text = "opencode",
-      style = MaterialTheme.typography.titleLarge
+      style = MaterialTheme.typography.titleLarge,
     )
     if (sessions.isEmpty()) {
       Text(
         text = "No sessions yet",
-        style = MaterialTheme.typography.headlineSmall
+        style = MaterialTheme.typography.headlineSmall,
       )
       Text(
         text = "Sessions you create will appear here.",
-        style = MaterialTheme.typography.bodyMedium
+        style = MaterialTheme.typography.bodyMedium,
       )
       Button(
         onClick = onNewSession,
-        modifier = Modifier.semantics { contentDescription = "New session" }
+        modifier = Modifier.semantics { contentDescription = "New session" },
       ) {
         Text(text = "New session")
       }
@@ -55,7 +55,7 @@ fun SessionsScreen(
       LazyColumn(
         state = sessionsListState,
         modifier = Modifier.fillMaxWidth().weight(weight = 1f),
-        verticalArrangement = Arrangement.spacedBy(space = 8.dp)
+        verticalArrangement = Arrangement.spacedBy(space = 8.dp),
       ) {
         items(items = sessions, key = { it.id }) { session ->
           Text(text = session.id)

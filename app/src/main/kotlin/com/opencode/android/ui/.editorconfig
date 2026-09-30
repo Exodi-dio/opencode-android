@@ -1,0 +1,10 @@
+# M1: @Composable uppercase names (ChatScreen, SessionsScreen, SettingsScreen,
+# SettingStub, OpencodeTheme) and the NavRoutes route-holder are intended by the
+# brief and must not be renamed; ktlint's function-naming and filename rules are
+# disabled for this directory only (both old- and new-style keys for ktlint 1.x
+# compat). Trailing-comma and all other rules still apply.
+[*.kt]
+ktlint_function_naming = disabled
+ktlint_standard_function-naming = disabled
+ktlint_filename = disabled
+ktlint_standard_filename = disabled

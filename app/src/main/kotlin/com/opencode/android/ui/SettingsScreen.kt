@@ -19,30 +19,30 @@ import androidx.compose.ui.unit.dp
 fun SettingsScreen(
   onProviderClick: () -> Unit = {},
   onModelClick: () -> Unit = {},
-  onAgentClick: () -> Unit = {}
+  onAgentClick: () -> Unit = {},
 ) {
   Column(
     modifier = Modifier.fillMaxSize().padding(all = 16.dp),
-    verticalArrangement = Arrangement.spacedBy(space = 12.dp)
+    verticalArrangement = Arrangement.spacedBy(space = 12.dp),
   ) {
     Text(
       text = "Settings",
-      style = MaterialTheme.typography.titleLarge
+      style = MaterialTheme.typography.titleLarge,
     )
     SettingStub(
       label = "Provider",
       description = "Provider picker",
-      onClick = onProviderClick
+      onClick = onProviderClick,
     )
     SettingStub(
       label = "Model",
       description = "Model picker",
-      onClick = onModelClick
+      onClick = onModelClick,
     )
     SettingStub(
       label = "Agent",
       description = "Agent picker",
-      onClick = onAgentClick
+      onClick = onAgentClick,
     )
   }
 }
@@ -51,11 +51,11 @@ fun SettingsScreen(
 private fun SettingStub(
   label: String,
   description: String,
-  onClick: () -> Unit
+  onClick: () -> Unit,
 ) {
   Button(
     onClick = onClick,
-    modifier = Modifier.semantics { contentDescription = description }
+    modifier = Modifier.semantics { contentDescription = description },
   ) {
     Text(text = label)
   }

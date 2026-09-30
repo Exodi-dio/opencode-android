@@ -39,7 +39,7 @@ private val DarkColors = darkColorScheme(
   surface = Color(DARK_SURFACE),
   onSurface = Color(DARK_ON_SURFACE),
   onSurfaceVariant = Color(DARK_MUTED),
-  error = Color(DARK_ERROR)
+  error = Color(DARK_ERROR),
 )
 
 private val LightColors = lightColorScheme(
@@ -52,16 +52,16 @@ private val LightColors = lightColorScheme(
   surface = Color(LIGHT_SURFACE),
   onSurface = Color(LIGHT_ON_SURFACE),
   onSurfaceVariant = Color(LIGHT_MUTED),
-  error = Color(LIGHT_ERROR)
+  error = Color(LIGHT_ERROR),
 )
 
 @Composable
 fun OpencodeTheme(
   darkTheme: Boolean = true,
-  content: @Composable () -> Unit
+  content: @Composable () -> Unit,
 ) {
   MaterialTheme(
     colorScheme = if (darkTheme) DarkColors else LightColors,
-    content = content
+    content = content,
   )
 }

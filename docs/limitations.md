@@ -19,3 +19,6 @@
   with implementation evidence in M3/M6.
 - minSdk 26, targetSdk 35, no Google Play Services / Firebase; F-Droid friendly set
   stays fixed unless a parity row approves the bump.
+- `:core:permission` is a pure-JVM `kotlin("jvm")` library in M1 (converts back to
+  `com.android.library` in M3 for Keystore/FGS bridges); `:core:providers` must keep
+  depending only on the pure policy types (`PermissionTable`, `Rule`, `Verdict`).

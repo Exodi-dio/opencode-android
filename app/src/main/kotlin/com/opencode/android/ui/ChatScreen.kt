@@ -26,27 +26,27 @@ import androidx.compose.ui.unit.dp
 fun ChatScreen(
   sessionId: String,
   chunks: List<String> = emptyList(),
-  onPermissionRequest: () -> Unit = {}
+  onPermissionRequest: () -> Unit = {},
 ) {
   val chatListState = rememberLazyListState()
   Column(
     modifier = Modifier.fillMaxSize().padding(all = 16.dp),
-    verticalArrangement = Arrangement.spacedBy(space = 12.dp)
+    verticalArrangement = Arrangement.spacedBy(space = 12.dp),
   ) {
     Text(
       text = sessionId,
-      style = MaterialTheme.typography.titleMedium
+      style = MaterialTheme.typography.titleMedium,
     )
     if (chunks.isEmpty()) {
       Text(
         text = "No messages yet",
-        style = MaterialTheme.typography.bodyMedium
+        style = MaterialTheme.typography.bodyMedium,
       )
     } else {
       LazyColumn(
         state = chatListState,
         modifier = Modifier.fillMaxWidth().weight(weight = 1f),
-        verticalArrangement = Arrangement.spacedBy(space = 8.dp)
+        verticalArrangement = Arrangement.spacedBy(space = 8.dp),
       ) {
         items(count = chunks.size, key = { index -> "chunk-$index" }) { index ->
           Text(text = chunks[index])
@@ -54,16 +54,16 @@ fun ChatScreen(
       }
     }
     OutlinedCard(
-      modifier = Modifier.fillMaxWidth().semantics { contentDescription = "Tool card" }
+      modifier = Modifier.fillMaxWidth().semantics { contentDescription = "Tool card" },
     ) {
       Text(
         text = "No tool calls",
-        modifier = Modifier.padding(all = 12.dp)
+        modifier = Modifier.padding(all = 12.dp),
       )
     }
     Button(
       onClick = onPermissionRequest,
-      modifier = Modifier.semantics { contentDescription = "Show permission sheet" }
+      modifier = Modifier.semantics { contentDescription = "Show permission sheet" },
     ) {
       Text(text = "Permissions")
     }
