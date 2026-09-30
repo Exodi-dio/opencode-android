@@ -62,6 +62,8 @@ dependencies {
   implementation(libs.compose.material3)
   implementation(libs.hilt.android)
   ksp(libs.hilt.compiler)
+  // Task 7 fix: SessionsScreen renders frozen SessionEntity from :core:session.
+  implementation(project(":core:session"))
   // M1 StartupTest (Robolectric, activity launches).
   testImplementation(libs.junit4)
   testImplementation(libs.robolectric)
