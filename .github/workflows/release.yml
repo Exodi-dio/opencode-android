@@ -1,0 +1,108 @@
+# M1 release skeleton: manual + tag builds. Signs only when keystore secrets
+# are present; otherwise builds unsigned and writes a SIGNING_MISSING notice.
+# Never fails M1 for missing keys. Includes the baseline-profile stub job
+# (TODO marker artifact; the real generator lands post-M1).
+# Cloud-only: ubuntu-latest runners. Nothing executes locally.
+#
+# Setup steps (checkout, JDK 21, manual SDK install, wrapper generation) are
+# copied verbatim from ci.yml -- NEVER use the obsolete android-actions setup
+# action (removed `tools` package).
+
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GRADLE_VERSION: 8.10.2
+  ANDROID_API: "35"
+  ANDROID_BUILD_TOOLS: 35.0.0
+  NDK_VERSION: 27.2.12479018
+
+jobs:
+  build:
+    name: release build (signed if secrets present)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install pinned SDK packages
+        run: |
+          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/cmdline-tools/16.0/bin:$PATH"
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "platform-tools" "platforms;android-${{ env.ANDROID_API }}" "build-tools;${{ env.ANDROID_BUILD_TOOLS }}" "ndk;${{ env.NDK_VERSION }}"
+      - name: Generate Gradle wrapper (pinned 8.10.2)
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+          arguments: wrapper --gradle-version ${{ env.GRADLE_VERSION }}
+      - name: Check signing secrets
+        id: signing
+        run: |
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ] && [ -n "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" ] && [ -n "${{ secrets.ANDROID_KEY_ALIAS }}" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Decode keystore
+        if: steps.signing.outputs.present == 'true'
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > /tmp/release.keystore
+      - name: Assemble signed release
+        if: steps.signing.outputs.present == 'true'
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: :app:assembleRelease -Pandroid.injected.signing.store.file=/tmp/release.keystore -Pandroid.injected.signing.store.password=${{ secrets.ANDROID_KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.ANDROID_KEY_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.ANDROID_KEY_PASSWORD }}
+      - name: Assemble unsigned release
+        if: steps.signing.outputs.present != 'true'
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: :app:assembleRelease
+      - name: Write SIGNING_MISSING notice
+        if: steps.signing.outputs.present != 'true'
+        run: |
+          printf '%s\n' "SIGNING_MISSING: no keystore secrets configured; this APK is unsigned and not for distribution." > app/build/outputs/apk/release/SIGNING_MISSING.txt
+      - name: Upload release artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ github.run_number }}
+          path: |
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/apk/release/SIGNING_MISSING.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+  baseline-profile-stub:
+    name: baseline-profile (stub, M1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Write baseline-profile TODO marker
+        run: |
+          mkdir -p baseline-profile-stub
+          printf '%s\n' "TODO: baseline profile generator lands post-M1; this stub keeps the release surface wired." > baseline-profile-stub/TODO-baseline-profile.txt
+      - name: Upload baseline-profile stub
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline-profile-stub
+          path: baseline-profile-stub/
+          if-no-files-found: warn
+          retention-days: 14

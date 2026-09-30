@@ -17,6 +17,8 @@ android {
     versionCode = 1
     versionName = "1.0"
 
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
     // NDK ABIs (docs/parity.md "native/SDK pins" row).
     ndk {
       abiFilters += listOf("arm64-v8a", "x86_64")
@@ -48,4 +50,8 @@ dependencies {
   // M1 StartupTest (Robolectric, activity launches).
   testImplementation(libs.junit4)
   testImplementation(libs.robolectric)
+  // M1 LaunchTest (instrumented, emulator/scenarios workflows).
+  androidTestImplementation(libs.androidx.test.ext.junit)
+  androidTestImplementation(libs.test.runner)
+  androidTestImplementation(libs.espresso.core)
 }

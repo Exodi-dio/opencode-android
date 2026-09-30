@@ -1,0 +1,56 @@
+# Nightly upstream watcher: diffs live upstream HEAD against the cached pin
+# (UPSTREAM_PIN_SHA, mirrors UPSTREAM.md) and opens an issue when it moves.
+# Cloud-only: ubuntu-latest runners. `issues: write` is scoped to this
+# workflow because opening the drift issue requires it; everything else stays
+# at contents: read.
+
+name: upstream-watch
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: upstream-watch
+  cancel-in-progress: true
+
+env:
+  UPSTREAM_REPO: https://github.com/anomalyco/opencode
+  UPSTREAM_PIN_SHA: 2fa3363c924c5c3e367b84a87ae478296a0ed59b
+
+jobs:
+  watch:
+    name: watch upstream HEAD
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check upstream HEAD against cached pin
+        id: check
+        run: |
+          live=$(git ls-remote "$UPSTREAM_REPO" HEAD | awk '{print $1}')
+          echo "live=$live"
+          echo "live=$live" >> "$GITHUB_OUTPUT"
+          echo "pinned=$UPSTREAM_PIN_SHA"
+          if [ "$live" = "$UPSTREAM_PIN_SHA" ]; then
+            echo "drift=false" >> "$GITHUB_OUTPUT"
+            echo "Upstream HEAD matches cached pin; no drift."
+          else
+            echo "drift=true" >> "$GITHUB_OUTPUT"
+            echo "Upstream drift detected: $live != $UPSTREAM_PIN_SHA"
+          fi
+      - name: Open drift issue
+        if: steps.check.outputs.drift == 'true'
+        run: |
+          gh issue create \
+            --title "Upstream drift: HEAD moved to ${LIVE}" \
+            --body "Upstream HEAD is now \`${LIVE}\`; cached pin is \`${PIN}\` (see UPSTREAM.md). Re-pin or confirm parity before the next release cut."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LIVE: ${{ steps.check.outputs.live }}
+          PIN: ${{ env.UPSTREAM_PIN_SHA }}

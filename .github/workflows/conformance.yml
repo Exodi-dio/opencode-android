@@ -1,0 +1,57 @@
+# M1 conformance stub: pins upstream, probes the oracle CLI --help, runs the
+# stub script (always green in M1), uploads the differential report stub.
+# Cloud-only: ubuntu-latest runners. No Gradle invocation, so no Android
+# SDK setup (Gradle workflows copy the proven ci.yml setup verbatim).
+# Real differential oracle lands in M6.
+
+name: conformance
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: conformance-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UPSTREAM_REPO: https://github.com/anomalyco/opencode
+  UPSTREAM_PIN_SHA: 2fa3363c924c5c3e367b84a87ae478296a0ed59b
+
+jobs:
+  conformance:
+    name: conformance (stub, M1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Check out upstream at pinned SHA
+        uses: actions/checkout@v4
+        with:
+          repository: anomalyco/opencode
+          ref: ${{ env.UPSTREAM_PIN_SHA }}
+          path: upstream
+      - name: Oracle help (upstream CLI probe)
+        run: |
+          bun --version
+          git -C upstream rev-parse HEAD
+          (cd upstream && bun install --frozen-lockfile) || true
+          (cd upstream && (bun run opencode --help || bunx opencode --help)) || echo "ORACLE_HELP_UNAVAILABLE (M1 stub)"
+      - name: Run conformance stub
+        run: bash scripts/conformance_stub.sh conformance-report
+      - name: Upload differential report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: conformance-report
+          path: conformance-report/
+          if-no-files-found: warn
+          retention-days: 14
