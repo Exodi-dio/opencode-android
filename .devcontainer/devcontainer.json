@@ -1,0 +1,22 @@
+{
+  "name": "opencode-android (JDK 21, cloud-only)",
+  "image": "mcr.microsoft.com/devcontainers/java:1-21-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/gradle:1": {
+      "version": "8.10.2"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "mathiasfrohlich.Kotlin",
+        "vscjava.vscode-gradle"
+      ]
+    }
+  },
+  "hostRequirements": {
+    "cpus": 4
+  },
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "remoteUser": "vscode"
+}
