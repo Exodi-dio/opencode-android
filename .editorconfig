@@ -1,0 +1,13 @@
+# M1 code style: 2-space indents everywhere (matches Task 2 sources).
+# ktlint reads this file; without it ktlint defaults to 4-space indents and the
+# CI `lint` job (`./gradlew ktlintCheck detekt`) would fail on every source file.
+root = true
+
+[*.{kt,kts}]
+indent_style = space
+indent_size = 2
+continuation_indent_size = 2
+max_line_length = 120
+insert_final_newline = true
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true

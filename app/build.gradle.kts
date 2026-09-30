@@ -36,9 +36,16 @@ android {
   kotlinOptions {
     jvmTarget = "21"
   }
+  // Robolectric (StartupTest) needs the merged manifest/resources.
+  testOptions {
+    unitTests.isIncludeAndroidResources = true
+  }
 }
 
 dependencies {
   implementation(libs.hilt.android)
   ksp(libs.hilt.compiler)
+  // M1 StartupTest (Robolectric, activity launches).
+  testImplementation(libs.junit4)
+  testImplementation(libs.robolectric)
 }

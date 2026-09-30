@@ -1,0 +1,17 @@
+# M1 detekt gate: detekt default rules as baseline, plus a ForbiddenImport ban on
+# android.* in pure-Kotlin modules (agent/tools/providers/config). The same
+# invariant is enforced by PureKotlinGuardTest in the CI `unit` job; this rule
+# makes it visible to detekt/IDE runs too. The detekt Gradle plugin picks up
+# this path ($rootDir/config/detekt/detekt.yml) by default.
+buildUponDefaultConfig: true
+
+style:
+  ForbiddenImport:
+    active: true
+    imports:
+      - 'android.*'
+    includes:
+      - '**/core/agent/**'
+      - '**/core/tools/**'
+      - '**/core/providers/**'
+      - '**/core/config/**'

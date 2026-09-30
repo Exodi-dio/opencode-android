@@ -10,4 +10,34 @@ plugins {
   alias(libs.plugins.kotlin.jvm) apply false
   alias(libs.plugins.hilt) apply false
   alias(libs.plugins.ksp) apply false
+  // M1 lint gate (CI `lint` job runs `./gradlew ktlintCheck detekt`): applied to
+  // the root project here so the bare task names resolve at the root too.
+  alias(libs.plugins.ktlint)
+  alias(libs.plugins.detekt)
+}
+
+// M1 lint wiring: ktlint + detekt run on every module. Declared (apply false)
+// above is not enough — each project must apply the plugin for its
+// `ktlintCheck`/`detekt` tasks to exist under bare-name invocation.
+subprojects {
+  apply(plugin = "org.jlleitschuh.gradle.ktlint")
+  apply(plugin = "io.gitlab.arturbosch.detekt")
+
+  // M1 `unit`-job shim: bare `./gradlew testDebugUnitTest` fails on any project
+  // without that task (pure-Kotlin modules only have `test`). Alias it so the
+  // brief's exact command stays green on every module.
+  afterEvaluate {
+    if (tasks.findByName("testDebugUnitTest") == null) {
+      tasks.register("testDebugUnitTest") {
+        tasks.findByName("test")?.let { dependsOn(it) }
+        description = "M1 shim: alias JVM 'test' so root 'testDebugUnitTest' covers pure-Kotlin modules."
+      }
+    }
+  }
+}
+
+// Root aggregate placeholder so bare `./gradlew testDebugUnitTest` also resolves
+// in the root project; Gradle name-matching runs each subproject's own task.
+tasks.register("testDebugUnitTest") {
+  description = "M1 aggregate: runs testDebugUnitTest in every module (pure-Kotlin modules via shim)."
 }

@@ -1,0 +1,228 @@
+# M1 cloud gate: lint + unit + Robolectric + APK + NDK + readelf.
+# Cloud-only: every job runs on ubuntu-latest runners (or Codespaces). Nothing
+# here executes on a contributor's local machine.
+#
+# Wrapper strategy: the repo pins Gradle 8.10.2 via
+# gradle/wrapper/gradle-wrapper.properties but does NOT check in gradlew scripts
+# (Task 3's post-create.sh generates them in Codespaces via
+# `gradle wrapper --gradle-version 8.10.2`). Each Gradle job below therefore
+# installs the pinned Gradle with gradle/gradle-build-action and generates the
+# wrapper before any ./gradlew invocation.
+
+name: ci
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GRADLE_VERSION: 8.10.2
+  ANDROID_API: "35"
+  ANDROID_BUILD_TOOLS: 35.0.0
+  NDK_VERSION: 27.2.12479018
+
+jobs:
+  lint:
+    name: lint (ktlint + detekt)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install pinned SDK packages
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "platform-tools" "platforms;android-${{ env.ANDROID_API }}" "build-tools;${{ env.ANDROID_BUILD_TOOLS }}" "ndk;${{ env.NDK_VERSION }}"
+      - name: Generate Gradle wrapper (pinned 8.10.2)
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+          arguments: wrapper --gradle-version ${{ env.GRADLE_VERSION }}
+      - name: ktlint + detekt
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: ktlintCheck detekt
+
+  unit:
+    name: unit (all modules)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install pinned SDK packages
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "platform-tools" "platforms;android-${{ env.ANDROID_API }}" "build-tools;${{ env.ANDROID_BUILD_TOOLS }}" "ndk;${{ env.NDK_VERSION }}"
+      - name: Generate Gradle wrapper (pinned 8.10.2)
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+          arguments: wrapper --gradle-version ${{ env.GRADLE_VERSION }}
+      - name: Unit tests (all modules)
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: testDebugUnitTest
+
+  robolectric:
+    name: robolectric (:app StartupTest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install pinned SDK packages
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "platform-tools" "platforms;android-${{ env.ANDROID_API }}" "build-tools;${{ env.ANDROID_BUILD_TOOLS }}" "ndk;${{ env.NDK_VERSION }}"
+      - name: Generate Gradle wrapper (pinned 8.10.2)
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+          arguments: wrapper --gradle-version ${{ env.GRADLE_VERSION }}
+      - name: Robolectric app tests
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: :app:testDebugUnitTest
+
+  assemble:
+    name: assemble (debug APK)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install pinned SDK packages
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "platform-tools" "platforms;android-${{ env.ANDROID_API }}" "build-tools;${{ env.ANDROID_BUILD_TOOLS }}" "ndk;${{ env.NDK_VERSION }}"
+      - name: Generate Gradle wrapper (pinned 8.10.2)
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+          arguments: wrapper --gradle-version ${{ env.GRADLE_VERSION }}
+      - name: Assemble debug APK
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: :app:assembleDebug
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+
+  ndk-matrix:
+    name: ndk (${{ matrix.abi }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        abi: [arm64-v8a, x86_64]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install pinned SDK packages
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "platform-tools" "platforms;android-${{ env.ANDROID_API }}" "build-tools;${{ env.ANDROID_BUILD_TOOLS }}" "ndk;${{ env.NDK_VERSION }}"
+      - name: Generate Gradle wrapper (pinned 8.10.2)
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+          arguments: wrapper --gradle-version ${{ env.GRADLE_VERSION }}
+      - name: Assemble native release
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: :native:assembleRelease
+      - name: Upload native lib (${{ matrix.abi }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-so-${{ matrix.abi }}
+          path: native/build/intermediates/cmake/release/obj/${{ matrix.abi }}/*.so
+          if-no-files-found: error
+          retention-days: 14
+
+  elf-check:
+    name: elf-check (16 KB page alignment)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [ndk-matrix]
+    steps:
+      - name: Download native libs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: native-so-*
+          path: sos
+          merge-multiple: true
+      - name: Verify LOAD segments are 16 KB aligned
+        # NOTE: `readelf -lW` (not plain `-l`): without -W, readelf wraps each
+        # program header over two lines, so `grep LOAD` never sees the Align
+        # column. -W keeps one header per line; same data, grep-able.
+        run: |
+          set -u
+          count=$(find sos -name '*.so' | wc -l)
+          if [ "$count" -eq 0 ]; then
+            echo "FAIL: no .so artifacts downloaded"
+            exit 1
+          fi
+          fail=0
+          for so in $(find sos -name '*.so'); do
+            echo "== $so"
+            loads=$(readelf -lW "$so" | grep LOAD || true)
+            if [ -z "$loads" ]; then
+              echo "FAIL: $so has no LOAD segments (not a valid ELF?)"
+              fail=1
+              continue
+            fi
+            echo "$loads"
+            missing=$(echo "$loads" | grep -vc '0x4000' || true)
+            if [ "$missing" -ne 0 ]; then
+              echo "FAIL: $so has LOAD segments without 0x4000 alignment (16 KB pages required)"
+              fail=1
+            fi
+          done
+          if [ "$fail" -ne 0 ]; then
+            exit 1
+          fi
+          echo "All LOAD segments are 16 KB aligned."
