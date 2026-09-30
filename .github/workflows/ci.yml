@@ -41,10 +41,9 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
       - name: Install pinned SDK packages
         run: |
+          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/cmdline-tools/16.0/bin:$PATH"
           yes | sdkmanager --licenses > /dev/null
           sdkmanager "platform-tools" "platforms;android-${{ env.ANDROID_API }}" "build-tools;${{ env.ANDROID_BUILD_TOOLS }}" "ndk;${{ env.NDK_VERSION }}"
       - name: Generate Gradle wrapper (pinned 8.10.2)
@@ -68,10 +67,9 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
       - name: Install pinned SDK packages
         run: |
+          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/cmdline-tools/16.0/bin:$PATH"
           yes | sdkmanager --licenses > /dev/null
           sdkmanager "platform-tools" "platforms;android-${{ env.ANDROID_API }}" "build-tools;${{ env.ANDROID_BUILD_TOOLS }}" "ndk;${{ env.NDK_VERSION }}"
       - name: Generate Gradle wrapper (pinned 8.10.2)
@@ -95,10 +93,9 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
       - name: Install pinned SDK packages
         run: |
+          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/cmdline-tools/16.0/bin:$PATH"
           yes | sdkmanager --licenses > /dev/null
           sdkmanager "platform-tools" "platforms;android-${{ env.ANDROID_API }}" "build-tools;${{ env.ANDROID_BUILD_TOOLS }}" "ndk;${{ env.NDK_VERSION }}"
       - name: Generate Gradle wrapper (pinned 8.10.2)
@@ -122,10 +119,9 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
       - name: Install pinned SDK packages
         run: |
+          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/cmdline-tools/16.0/bin:$PATH"
           yes | sdkmanager --licenses > /dev/null
           sdkmanager "platform-tools" "platforms;android-${{ env.ANDROID_API }}" "build-tools;${{ env.ANDROID_BUILD_TOOLS }}" "ndk;${{ env.NDK_VERSION }}"
       - name: Generate Gradle wrapper (pinned 8.10.2)
@@ -160,10 +156,9 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
       - name: Install pinned SDK packages
         run: |
+          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/cmdline-tools/16.0/bin:$PATH"
           yes | sdkmanager --licenses > /dev/null
           sdkmanager "platform-tools" "platforms;android-${{ env.ANDROID_API }}" "build-tools;${{ env.ANDROID_BUILD_TOOLS }}" "ndk;${{ env.NDK_VERSION }}"
       - name: Generate Gradle wrapper (pinned 8.10.2)
