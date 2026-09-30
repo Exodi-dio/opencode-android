@@ -174,7 +174,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: native-so-${{ matrix.abi }}
-          path: native/build/intermediates/cmake/release/obj/${{ matrix.abi }}/*.so
+          path: native/build/intermediates/cxx/Release/**/obj/${{ matrix.abi }}/*.so
           if-no-files-found: error
           retention-days: 14
 
