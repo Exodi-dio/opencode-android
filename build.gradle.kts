@@ -27,7 +27,8 @@ subprojects {
   // without that task (pure-Kotlin modules only have `test`). Alias it so the
   // brief's exact command stays green on every module.
   afterEvaluate {
-    if (tasks.findByName("testDebugUnitTest") == null) {
+    val isAndroid = plugins.hasPlugin("com.android.application") || plugins.hasPlugin("com.android.library")
+    if (!isAndroid && tasks.findByName("testDebugUnitTest") == null) {
       tasks.register("testDebugUnitTest") {
         tasks.findByName("test")?.let { dependsOn(it) }
         description = "M1 shim: alias JVM 'test' so root 'testDebugUnitTest' covers pure-Kotlin modules."
