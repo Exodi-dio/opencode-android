@@ -14,3 +14,4 @@ style:
       - '**/core/tools/**'
       - '**/core/providers/**'
       - '**/core/config/**'
+      - '**/core/permission/**'

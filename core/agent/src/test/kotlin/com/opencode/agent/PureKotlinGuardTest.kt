@@ -12,7 +12,14 @@ class PureKotlinGuardTest {
     val root =
       generateSequence(userDir) { it.parentFile }
         .firstOrNull { File(it, "settings.gradle.kts").exists() } ?: userDir
-    val roots = listOf("core/agent/src", "core/tools/src", "core/providers/src", "core/config/src")
+    val roots =
+      listOf(
+        "core/agent/src",
+        "core/tools/src",
+        "core/providers/src",
+        "core/config/src",
+        "core/permission/src",
+      )
     // Line-anchored: a real import starts the line. (A substring match would
     // self-flag this very file, which names the forbidden pattern in a string.)
     val hits =

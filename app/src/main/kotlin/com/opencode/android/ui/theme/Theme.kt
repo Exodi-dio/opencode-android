@@ -29,7 +29,8 @@ private const val LIGHT_SECONDARY = 0xFF7B5BB6
 private const val LIGHT_ACCENT = 0xFFD68C27
 private const val LIGHT_ERROR = 0xFFD1383D
 
-private val DarkColors = darkColorScheme(
+private val DarkColors =
+  darkColorScheme(
   primary = Color(DARK_PRIMARY),
   onPrimary = Color(DARK_ON_PRIMARY),
   secondary = Color(DARK_SECONDARY),
@@ -42,7 +43,8 @@ private val DarkColors = darkColorScheme(
   error = Color(DARK_ERROR),
 )
 
-private val LightColors = lightColorScheme(
+private val LightColors =
+  lightColorScheme(
   primary = Color(LIGHT_PRIMARY),
   onPrimary = Color(LIGHT_ON_PRIMARY),
   secondary = Color(LIGHT_SECONDARY),
