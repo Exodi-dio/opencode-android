@@ -31,31 +31,31 @@ private const val LIGHT_ERROR = 0xFFD1383D
 
 private val DarkColors =
   darkColorScheme(
-  primary = Color(DARK_PRIMARY),
-  onPrimary = Color(DARK_ON_PRIMARY),
-  secondary = Color(DARK_SECONDARY),
-  tertiary = Color(DARK_ACCENT),
-  background = Color(DARK_BACKGROUND),
-  onBackground = Color(DARK_ON_SURFACE),
-  surface = Color(DARK_SURFACE),
-  onSurface = Color(DARK_ON_SURFACE),
-  onSurfaceVariant = Color(DARK_MUTED),
-  error = Color(DARK_ERROR),
-)
+    primary = Color(DARK_PRIMARY),
+    onPrimary = Color(DARK_ON_PRIMARY),
+    secondary = Color(DARK_SECONDARY),
+    tertiary = Color(DARK_ACCENT),
+    background = Color(DARK_BACKGROUND),
+    onBackground = Color(DARK_ON_SURFACE),
+    surface = Color(DARK_SURFACE),
+    onSurface = Color(DARK_ON_SURFACE),
+    onSurfaceVariant = Color(DARK_MUTED),
+    error = Color(DARK_ERROR),
+  )
 
 private val LightColors =
   lightColorScheme(
-  primary = Color(LIGHT_PRIMARY),
-  onPrimary = Color(LIGHT_ON_PRIMARY),
-  secondary = Color(LIGHT_SECONDARY),
-  tertiary = Color(LIGHT_ACCENT),
-  background = Color(LIGHT_BACKGROUND),
-  onBackground = Color(LIGHT_ON_SURFACE),
-  surface = Color(LIGHT_SURFACE),
-  onSurface = Color(LIGHT_ON_SURFACE),
-  onSurfaceVariant = Color(LIGHT_MUTED),
-  error = Color(LIGHT_ERROR),
-)
+    primary = Color(LIGHT_PRIMARY),
+    onPrimary = Color(LIGHT_ON_PRIMARY),
+    secondary = Color(LIGHT_SECONDARY),
+    tertiary = Color(LIGHT_ACCENT),
+    background = Color(LIGHT_BACKGROUND),
+    onBackground = Color(LIGHT_ON_SURFACE),
+    surface = Color(LIGHT_SURFACE),
+    onSurface = Color(LIGHT_ON_SURFACE),
+    onSurfaceVariant = Color(LIGHT_MUTED),
+    error = Color(LIGHT_ERROR),
+  )
 
 @Composable
 fun OpencodeTheme(

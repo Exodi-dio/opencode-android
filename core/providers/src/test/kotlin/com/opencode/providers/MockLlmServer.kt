@@ -8,6 +8,7 @@ import io.ktor.server.netty.Netty
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
@@ -28,7 +29,7 @@ class MockLlmServer {
     }
     server.start(wait = false)
     engine = server
-    return server.resolvedConnectors().first().port
+    return runBlocking { server.resolvedConnectors() }.first().port
   }
 
   fun replay(name: String): List<String> {
