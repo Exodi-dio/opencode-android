@@ -24,7 +24,10 @@ class PermissionTable(
     return if (allowMatch) Verdict.ALLOW else Verdict.DENY
   }
 
-  private fun matches(pattern: String, tool: String): Boolean {
+  private fun matches(
+    pattern: String,
+    tool: String,
+  ): Boolean {
     if (pattern.endsWith("*")) {
       return tool.startsWith(pattern.dropLast(1))
     }
