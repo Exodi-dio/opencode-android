@@ -3,7 +3,6 @@
 # invariant is enforced by PureKotlinGuardTest in the CI `unit` job; this rule
 # makes it visible to detekt/IDE runs too. The detekt Gradle plugin picks up
 # this path ($rootDir/config/detekt/detekt.yml) by default.
-buildUponDefaultConfig: true
 
 style:
   ForbiddenImport:
